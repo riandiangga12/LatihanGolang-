@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+option go_package = "Session-16/proto/user_service/v1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+package proto.user_service.v1;
+
+service WalletService{
+    rpc GetWallets(google.protobuf.Empty) returns (GetWalletsResponse){
+        option (google.api.http) = {
+            get: "/v1/wallets"
+        };
+    }
+    rpc GetWalletByID(GetWalletByIDRequest) returns (GetWalletByIDResponse){
+        option (google.api.http) = {
+            get: "/v1/wallets/{id}"
+        };
+    }
+    rpc CreateWallet(CreateWalletRequest) returns (WalletMutationResponse){
+        option (google.api.http) = {
+            post: "/v1/wallets"
+            body: "*"
+        };
+    }
+    rpc CreateTransaction(CreateTransactionRequest) returns (WalletMutationResponse){
+        option (google.api.http) = {
+            post: "/v1/wallets/transactions"
+            body: "*"
+        };
+    }
+    rpc TopUpWallet(TopUpWalletRequest) returns (WalletMutationResponse){
+        option (google.api.http) = {
+            post: "/v1/wallets/topup/{user_id}/{amount}"
+            body: "*"
+        };
+    }
+    rpc TransferWallet(TransferWalletRequest) returns (WalletMutationResponse){
+        option (google.api.http) = {
+            post: "/v1/wallets/transfer/{from}/{to}/{amount}"
+            body: "*"
+        };
+    }
+    rpc GetWalletBalance(GetWalletBalanceRequest) returns (GetWalletBalanceResponse){
+        option (google.api.http) = {
+            get: "/v1/wallets/{user_id}"
+        };
+    }
+    rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse){
+        option (google.api.http) = {
+            get: "/v1/wallets/transactions/{user_id}"
+        };
+    }
+}
+
+message Wallet{
+    int32 id = 1;
+    int32 user_id = 2;
+    float balance = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+message GetWalletsResponse{
+    repeated Wallet wallets = 1;
+}
+
+message CreateWalletRequest{
+    int32 user_id = 1;
+}
+
+message GetWalletByIDRequest{
+    int32 id = 1;
+}
+
+message GetWalletByIDResponse{
+    Wallet wallet = 1;
+}
+
+message CreateTransactionRequest{
+    int32 wallet_id = 1;
+    int32 wallet_to = 2;
+    float amount = 3;
+    string type = 4;
+}
+
+message TopUpWalletRequest{
+    int32 user_id = 1;
+    float amount = 2;
+}
+
+message TransferWalletRequest{
+    int32 from = 1;
+    int32 to = 2;
+    float amount = 3;
+}
+
+message GetWalletBalanceRequest{
+    int32 user_id = 1;
+}
+
+message GetWalletBalanceResponse{
+    float balance = 1;
+}
+
+message GetTransactionsRequest{
+    int32 user_id = 1;
+}
+
+message GetTransactionsResponse{
+    repeated Transaction transactions = 1;
+}
+
+message Transaction{
+    int32 id = 1;
+    int32 wallet_id = 2;
+    int32 wallet_to = 3;
+    float amount = 4;
+    string type = 5;
+    google.protobuf.Timestamp created_at = 6;
+}
+
+message WalletMutationResponse{
+    int32 id = 1;
+    string message = 2;
+}
